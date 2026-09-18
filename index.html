@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Telegram bot buyurtma qilish</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0F1626;
+    --bg-soft: #141D33;
+    --card: #17213B;
+    --card-border: #263252;
+    --text: #EAF1FF;
+    --text-dim: #96A5C7;
+    --accent: #33D6C4;
+    --accent-soft: rgba(51, 214, 196, 0.14);
+    --accent-2: #4C8DFF;
+    --danger: #FF7A7A;
+    --font-display: 'Sora', system-ui, sans-serif;
+    --font-body: 'Inter', system-ui, sans-serif;
+  }
+
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg: #F3F5FA;
+      --bg-soft: #E9ECF5;
+      --card: #FFFFFF;
+      --card-border: #DDE3F0;
+      --text: #101526;
+      --text-dim: #5C6684;
+      --accent: #17B3A3;
+      --accent-soft: rgba(23, 179, 163, 0.1);
+      --accent-2: #3E75E0;
+    }
+  }
+
+  :root[data-theme="light"] {
+    --bg: #F3F5FA;
+    --bg-soft: #E9ECF5;
+    --card: #FFFFFF;
+    --card-border: #DDE3F0;
+    --text: #101526;
+    --text-dim: #5C6684;
+    --accent: #17B3A3;
+    --accent-soft: rgba(23, 179, 163, 0.1);
+    --accent-2: #3E75E0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at 15% 0%, var(--bg-soft) 0%, transparent 45%),
+      radial-gradient(circle at 85% 100%, var(--bg-soft) 0%, transparent 45%),
+      var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+
+  .wrap {
+    width: 100%;
+    max-width: 440px;
+  }
+
+  .eyebrow-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+
+  .glyph {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: var(--accent-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .glyph svg { width: 20px; height: 20px; }
+
+  .brand {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.01em;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 6vw, 36px);
+    font-weight: 800;
+    line-height: 1.15;
+    margin: 0 0 12px;
+    max-width: 20ch;
+  }
+
+  .lede {
+    color: var(--text-dim);
+    font-size: 15.5px;
+    line-height: 1.6;
+    margin: 0 0 28px;
+    max-width: 42ch;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: 0 20px 50px -25px rgba(0,0,0,0.5);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: "";
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 160px;
+    height: 160px;
+    background: radial-gradient(circle, var(--accent-soft) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .field {
+    margin-bottom: 18px;
+  }
+
+  label {
+    display: block;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text-dim);
+    margin-bottom: 7px;
+  }
+
+  input {
+    width: 100%;
+    padding: 13px 14px;
+    border-radius: 11px;
+    border: 1.5px solid var(--card-border);
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    transition: border-color 0.15s ease;
+  }
+
+  input::placeholder { color: var(--text-dim); opacity: 0.7; }
+
+  input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+
+  .err {
+    color: var(--danger);
+    font-size: 12.5px;
+    margin-top: 6px;
+    min-height: 15px;
+    display: block;
+  }
+
+  button {
+    font-family: var(--font-body);
+    cursor: pointer;
+    border: none;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: 12px;
+    background: var(--accent);
+    color: #06231F;
+    font-weight: 700;
+    font-size: 15.5px;
+    margin-top: 6px;
+    transition: transform 0.12s ease, filter 0.15s ease;
+  }
+
+  .submit-btn:hover { filter: brightness(1.06); }
+  .submit-btn:active { transform: scale(0.98); }
+
+  .note {
+    font-size: 12.5px;
+    color: var(--text-dim);
+    text-align: center;
+    margin-top: 14px;
+    line-height: 1.5;
+  }
+
+  /* success state */
+  .success {
+    display: none;
+    text-align: center;
+  }
+
+  .success.active { display: block; }
+  .form-view.hidden { display: none; }
+
+  .check {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 18px;
+  }
+
+  .check svg { width: 26px; height: 26px; }
+
+  .success h2 {
+    font-family: var(--font-display);
+    font-size: 21px;
+    font-weight: 700;
+    margin: 0 0 8px;
+  }
+
+  .success p {
+    color: var(--text-dim);
+    font-size: 14.5px;
+    line-height: 1.6;
+    margin: 0 0 22px;
+  }
+
+  .tg-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent-2), #2AABEE);
+    color: #fff;
+    font-weight: 700;
+    font-size: 15.5px;
+    text-decoration: none;
+    transition: transform 0.12s ease, filter 0.15s ease;
+  }
+
+  .tg-btn:hover { filter: brightness(1.08); }
+  .tg-btn:active { transform: scale(0.98); }
+  .tg-btn svg { width: 19px; height: 19px; }
+
+  .summary {
+    background: var(--bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    text-align: left;
+  }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    padding: 5px 0;
+  }
+
+  .summary-row + .summary-row {
+    border-top: 1px solid var(--card-border);
+  }
+
+  .summary-row span:first-child { color: var(--text-dim); }
+  .summary-row span:last-child { font-weight: 600; }
+
+  .edit-link {
+    background: none;
+    color: var(--text-dim);
+    font-size: 13px;
+    text-decoration: underline;
+    margin-top: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow-row">
+    <div class="glyph">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M21 4L3 11.5L10 13.5M21 4L15 20L10 13.5M21 4L10 13.5" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="brand" style="color:var(--text)">Bot buyurtma</div>
+  </div>
+
+  <h1>O'zingizga kerakli Telegram botni buyurtma bering</h1>
+  <p class="lede">Ismingiz va telefon raqamingizni qoldiring — keyin bitta tugma bosish bilan to'g'ridan-to'g'ri Telegramda bog'lanamiz.</p>
+
+  <div class="card">
+
+    <form class="form-view" id="regForm" novalidate>
+      <div class="field">
+        <label for="name">Ismingiz</label>
+        <input type="text" id="name" placeholder="Masalan: Aziz" autocomplete="name">
+        <span class="err" id="nameErr"></span>
+      </div>
+
+      <div class="field">
+        <label for="phone">Telefon raqamingiz</label>
+        <input type="tel" id="phone" placeholder="+998 90 123 45 67" autocomplete="tel">
+        <span class="err" id="phoneErr"></span>
+      </div>
+
+      <button type="submit" class="submit-btn">Ro'yxatdan o'tish</button>
+      <p class="note">Ma'lumotlaringiz faqat siz bilan bog'lanish uchun ishlatiladi.</p>
+    </form>
+
+    <div class="success" id="successView">
+      <div class="check">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 6L9 17L4 12" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2>Rahmat!</h2>
+      <p>Ma'lumotlaringiz qabul qilindi. Endi pastdagi tugmani bosib, Telegramda yozishni boshlang.</p>
+
+      <div class="summary">
+        <div class="summary-row"><span>Ism</span><span id="sumName">—</span></div>
+        <div class="summary-row"><span>Telefon</span><span id="sumPhone">—</span></div>
+      </div>
+
+      <a href="https://t.me/zohirshoh_13" target="_blank" rel="noopener" class="tg-btn" id="tgLink">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.05 3.6c.28-.14.62-.12.87.06.25.17.4.47.36.77l-2.6 15.1c-.06.35-.3.63-.63.72-.33.1-.68 0-.91-.24l-4.2-3.86-2.1 2.25c-.2.21-.5.28-.77.18-.27-.1-.45-.35-.46-.64l-.13-3.86-6-2.1c-.35-.12-.58-.44-.58-.8 0-.36.24-.68.6-.8l16.55-6.78Z"/></svg>
+        Telegramga yozish
+      </a>
+
+      <div>
+        <button type="button" class="edit-link" id="editBtn">Ma'lumotlarni tahrirlash</button>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+(function() {
+  const form = document.getElementById('regForm');
+  const successView = document.getElementById('successView');
+  const nameInput = document.getElementById('name');
+  const phoneInput = document.getElementById('phone');
+  const nameErr = document.getElementById('nameErr');
+  const phoneErr = document.getElementById('phoneErr');
+  const sumName = document.getElementById('sumName');
+  const sumPhone = document.getElementById('sumPhone');
+  const editBtn = document.getElementById('editBtn');
+
+  function loadSaved() {
+    try {
+      const saved = localStorage.getItem('bot_order_contact');
+      if (saved) {
+        const data = JSON.parse(saved);
+        if (data.name && data.phone) {
+          nameInput.value = data.name;
+          phoneInput.value = data.phone;
+          showSuccess(data.name, data.phone);
+        }
+      }
+    } catch (e) {
+      // storage unavailable — carry on with an empty form
+    }
+  }
+
+  function showSuccess(name, phone) {
+    sumName.textContent = name;
+    sumPhone.textContent = phone;
+    form.classList.add('hidden');
+    successView.classList.add('active');
+  }
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    nameErr.textContent = '';
+    phoneErr.textContent = '';
+
+    const name = nameInput.value.trim();
+    const phone = phoneInput.value.trim();
+    let valid = true;
+
+    if (name.length < 2) {
+      nameErr.textContent = 'Ismingizni to\'liq kiriting';
+      valid = false;
+    }
+
+    const phoneDigits = phone.replace(/[^0-9]/g, '');
+    if (phoneDigits.length < 9) {
+      phoneErr.textContent = 'Telefon raqamini to\'g\'ri kiriting';
+      valid = false;
+    }
+
+    if (!valid) return;
+
+    try {
+      localStorage.setItem('bot_order_contact', JSON.stringify({ name, phone }));
+    } catch (e) {
+      // storage unavailable — continue without persisting
+    }
+
+    showSuccess(name, phone);
+  });
+
+  editBtn.addEventListener('click', function() {
+    successView.classList.remove('active');
+    form.classList.remove('hidden');
+  });
+
+  loadSaved();
+})();
+</script>
+</body>
+</html>
